@@ -4,10 +4,11 @@ import com.contactsservice.usecasses.ContactService;
 import com.contactsservice.usecasses.dto.ContactRequestDto;
 import com.contactsservice.usecasses.dto.ContactResponseDto;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,7 +20,8 @@ import java.util.List;
 @Tag(name = "Contacts Controller", description = "API for working with contacts")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/contacts")
+@Validated
+@RequestMapping("/api/v1/contacts/")
 public class ContactApiController {
     private final ContactService contactService;
 
@@ -29,7 +31,7 @@ public class ContactApiController {
     }
 
     @PostMapping
-    public ResponseEntity<ContactResponseDto> saveContact(@RequestBody ContactRequestDto contactDto) {
+    public ResponseEntity<ContactResponseDto> saveContact(@RequestBody @Valid ContactRequestDto contactDto) {
         return new ResponseEntity<>(contactService.saveContact(contactDto), HttpStatus.CREATED);
     }
 }

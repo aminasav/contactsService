@@ -3,7 +3,7 @@ package com.contactsservice.usecasses.impl;
 import com.contactsservice.persistance.model.Contact;
 import com.contactsservice.persistance.repository.ContactRepository;
 import com.contactsservice.usecasses.ContactService;
-import com.contactsservice.usecasses.client.PhoneCodeServiceClient;
+import com.contactsservice.usecasses.client.PhoneCodeServiceFeignClient;
 import com.contactsservice.usecasses.dto.ContactRequestDto;
 import com.contactsservice.usecasses.dto.ContactResponseDto;
 import com.contactsservice.usecasses.dto.PhoneCodeResponseDto;
@@ -19,7 +19,8 @@ import java.util.List;
 public class ContactServiceImpl implements ContactService {
 
     private final ContactRepository contactRepository;
-    private final PhoneCodeServiceClient phoneCodeServiceClient;
+    //private final PhoneCodeServiceClient phoneCodeServiceClient;
+    private final PhoneCodeServiceFeignClient phoneCodeServiceClient;
     private final ContactMapper contactMapper;
 
     @Override
