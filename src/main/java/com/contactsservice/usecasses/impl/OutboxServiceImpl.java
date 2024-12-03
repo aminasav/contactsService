@@ -1,13 +1,14 @@
 package com.contactsservice.usecasses.impl;
 
+import com.byAmina.OutboxEventDTO;
 import com.contactsservice.persistance.model.OutboxEvent;
 import com.contactsservice.persistance.repository.OutboxEventRepository;
 import com.contactsservice.usecasses.OutboxService;
-import com.contactsservice.usecasses.dto.OutboxEventDTO;
 import com.contactsservice.usecasses.mapper.OutboxEventMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -23,8 +24,10 @@ import java.util.concurrent.ExecutionException;
 public class OutboxServiceImpl implements OutboxService {
     private final OutboxEventRepository outboxEventRepository;
     private final OutboxEventMapper outboxEventMapper;
-
     private final KafkaTemplate<String, OutboxEventDTO> kafkaTemplate;
+
+    @Value("${topic.name}")
+    private String topicName;
 
     @Scheduled(fixedRate = 5000)
     @Override
@@ -35,7 +38,7 @@ public class OutboxServiceImpl implements OutboxService {
             OutboxEventDTO eventDTO = outboxEventMapper.toDto(event);
 
             ProducerRecord<String,OutboxEventDTO> record = new ProducerRecord<>(
-                    "outbox-topic",
+                    topicName,
                     event.getId().toString(),
                     eventDTO
             );

@@ -41,10 +41,6 @@ public class ContactServiceImpl implements ContactService {
         return contactMapper.toResponseDtoList(contacts);
     }
 
-    private PhoneCodeResponseDto getPhoneCodeById(String phoneCode) {
-        return phoneCodeServiceClient.getPhoneCodeInfo(phoneCode);
-    }
-
     @Override
     public ContactResponseDto getContactByPhoneCode(String phoneCode) {
         PhoneCodeResponseDto phoneCodeResponseDto = phoneCodeServiceClient.getPhoneCodeInfo(phoneCode);

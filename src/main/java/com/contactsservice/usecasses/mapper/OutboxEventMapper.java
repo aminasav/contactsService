@@ -1,7 +1,7 @@
 package com.contactsservice.usecasses.mapper;
 
+import com.byAmina.OutboxEventDTO;
 import com.contactsservice.persistance.model.OutboxEvent;
-import com.contactsservice.usecasses.dto.OutboxEventDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
 

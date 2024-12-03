@@ -1,6 +1,6 @@
 package com.contactsservice.config;
 
-import com.contactsservice.usecasses.dto.OutboxEventDTO;
+import com.byAmina.OutboxEventDTO;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.springframework.beans.factory.annotation.Value;
