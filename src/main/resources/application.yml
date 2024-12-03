@@ -5,24 +5,57 @@ spring:
   application:
     name: CONTACTS-SERVICE
 
-
-  datasource:
-    url: jdbc:h2:mem:contactsdb
-    driver-class-name: org.h2.Driver
-    username: sa
-    password: password
-
-  jpa:
-      database-platform: org.hibernate.dialect.H2Dialect
-      hibernate:
-        ddl-auto: update
-  h2:
-      console:
-        enabled: true
   liquibase:
     change-log: classpath:/db/changelog/changelog.xml
+  config:
+    import: optional:configserver:http://localhost:8888
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/profiler
 
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: mapping,bus-refresh,bus-env,health,circuitbreakerevents,retry
+  endpoint:
+    health:
+      enabled: true
+      show-details: always
+  health:
+    circuitbreakers:
+      enabled: true
+
+resilience4j:
+  circuitbreaker:
+    circuit-breaker-aspect-order: 1
+    instances:
+      phone-codes-service:
+        ignore-exceptions:
+          - com.contactsservice.api.exception.NotFoundException
+          - com.contactsservice.api.exception.BadRequestException
+        failureRateThreshold: 50
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        waitDurationInOpenState: 10s
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 2
+        minimumNumberOfCalls: 1
+        eventConsumerBufferSize: 10
+        registerHealthIndicator: true
+        permittedNumberOfCallsInHalfOpenState: 3
+  retry:
+    retry-aspect-order: 2
+    instances:
+      phone-codes-service:
+        maxAttempts: 3
+        waitDuration: 5000
+

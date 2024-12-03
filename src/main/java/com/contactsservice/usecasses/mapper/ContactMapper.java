@@ -1,7 +1,7 @@
 package com.contactsservice.usecasses.mapper;
 
 import com.contactsservice.persistance.model.Contact;
-import com.contactsservice.usecasses.ContactService;
+import com.contactsservice.usecasses.client.PhoneCodeServiceFeignClient;
 import com.contactsservice.usecasses.dto.ContactRequestDto;
 import com.contactsservice.usecasses.dto.ContactResponseDto;
 import org.mapstruct.Builder;
@@ -14,12 +14,16 @@ import java.util.List;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING,
         builder = @Builder(disableBuilder = true))
-public interface ContactMapper {
+public abstract class ContactMapper {
 
-    ContactResponseDto toResponseDto(Contact contact);
+    @Autowired
+    protected PhoneCodeServiceFeignClient phoneCodeServiceClient;
+
+    @Mapping(target = "phoneCode", expression = "java(phoneCodeServiceClient.getPhoneCodeInfo(contact.getPhoneCodeId().toString()).code())")
+    public abstract ContactResponseDto toResponseDto(Contact contact);
 
     @Mapping(target = "cvId", ignore = true)
-    Contact toEntity(ContactRequestDto contactRequestDto);
+    public abstract Contact toEntity(ContactRequestDto contactRequestDto);
 
-    List<ContactResponseDto> toResponseDtoList(List<Contact> contacts);
+    public abstract List<ContactResponseDto> toResponseDtoList(List<Contact> contacts);
 }

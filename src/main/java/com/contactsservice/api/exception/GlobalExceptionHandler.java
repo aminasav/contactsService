@@ -1,78 +1,50 @@
 package com.contactsservice.api.exception;
 
-import jakarta.validation.ConstraintViolationException;
-import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.InternalServerErrorException;
-import jakarta.ws.rs.NotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.HashMap;
-import java.util.Map;
 
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
-    private static final String EUROPE_MOSCOW = "Europe/Moscow";
-
-    @ExceptionHandler(NotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ExceptionMessage handleNotFoundException(NotFoundException e) {
-        return new ExceptionMessage(
-                HttpStatus.NOT_FOUND.value(),
-                e.getMessage(),
-                ZonedDateTime.now().withZoneSameInstant(ZoneId.of(EUROPE_MOSCOW)));
-    }
-
-    @ExceptionHandler(BadRequestException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ExceptionMessage handleBadRequestException(BadRequestException e) {
-        return new ExceptionMessage(
-                HttpStatus.BAD_REQUEST.value(),
-                e.getMessage(),
-                ZonedDateTime.now().withZoneSameInstant(ZoneId.of(EUROPE_MOSCOW)));
-    }
-
-    @ExceptionHandler(InternalServerErrorException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ExceptionMessage handleInternalServerErrorException(InternalServerErrorException e) {
-        return new ExceptionMessage(
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                e.getMessage(),
-                ZonedDateTime.now().withZoneSameInstant(ZoneId.of(EUROPE_MOSCOW)));
-    }
-
-    @ExceptionHandler(ConstraintViolationException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ExceptionMessage handleValidationErrors(ConstraintViolationException exception) {
-        Map<String, String> errors = new HashMap<>();
-        exception.getConstraintViolations().forEach(constraintViolation -> constraintViolation.getPropertyPath()
-                .forEach(error -> errors.put(constraintViolation.getMessage(), error.getName())));
-        return new ExceptionMessage(
-                HttpStatus.BAD_REQUEST.value(),
-                errors.toString(),
-                ZonedDateTime.now().withZoneSameInstant(ZoneId.of(EUROPE_MOSCOW)));
+    @ExceptionHandler(ContactNotFoundException.class)
+    public ResponseEntity<ExceptionMessage> handleContactNotFoundException(ContactNotFoundException ex) {
+        return createResponseEntity(HttpStatus.NOT_FOUND.value(), ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(ServiceUnavailableException.class)
-    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
-    public ExceptionMessage handleServiceUnavailableException(ServiceUnavailableException e) {
-        return new ExceptionMessage(
-                HttpStatus.SERVICE_UNAVAILABLE.value(),
-                e.getMessage(),
-                ZonedDateTime.now().withZoneSameInstant(ZoneId.of(EUROPE_MOSCOW)));
+    public ResponseEntity<ExceptionMessage> handleServiceUnavailableException(ServiceUnavailableException ex) {
+        return createResponseEntity(HttpStatus.SERVICE_UNAVAILABLE.value(), ex.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);
+    }
+
+    @ExceptionHandler(ContactAlreadyExistsException.class)
+    public ResponseEntity<ExceptionMessage> handleContactAlreadyExistsException(ContactAlreadyExistsException ex) {
+        return createResponseEntity(HttpStatus.CONFLICT.value(), ex.getMessage(), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(ContactEventCreationException.class)
+    public ResponseEntity<ExceptionMessage> handleContactEventCreationException(ContactEventCreationException ex) {
+        log.error("Error creating contact event", ex);
+        return createResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR.value(), "An error occurred while processing the request", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ExceptionMessage handleException(Exception e) {
-        return new ExceptionMessage(
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                e.getMessage(),
-                ZonedDateTime.now().withZoneSameInstant(ZoneId.of(EUROPE_MOSCOW)));
+    public ResponseEntity<ExceptionMessage> handleGenericException(Exception ex) {
+        log.error("Unexpected error", ex);
+        return createResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR.value(), "An unexpected error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    private ResponseEntity<ExceptionMessage> createResponseEntity(int errorCode, String message, HttpStatus status) {
+        ExceptionMessage exceptionMessage = new ExceptionMessage(
+                errorCode,
+                message,
+                ZonedDateTime.now()
+        );
+        return new ResponseEntity<>(exceptionMessage, status);
     }
 }

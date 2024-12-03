@@ -1,13 +1,17 @@
 package com.contactsservice.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import feign.Logger;
 import feign.codec.ErrorDecoder;
+import lombok.RequiredArgsConstructor;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
-import org.yaml.snakeyaml.internal.Logger;
+
 
 @Configuration
+@RequiredArgsConstructor
 public class ContactConfig {
 
     @Bean
@@ -18,12 +22,11 @@ public class ContactConfig {
 
     @Bean
     public Logger.Level feignLoggerLevel() {
-        return Logger.Level.WARNING;
+        return Logger.Level.FULL;
     }
 
     @Bean
     public ErrorDecoder getFeignErrorDecoder() {
         return new FeignErrorDecoder();
     }
-
 }
