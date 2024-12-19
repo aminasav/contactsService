@@ -14,9 +14,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 @FeignClient(name = "PHONE-CODE-SERVICE", configuration = ContactConfig.class)
 public interface PhoneCodeServiceFeignClient {
     Logger logger = LoggerFactory.getLogger(PhoneCodeServiceFeignClient.class);
-
-    @CircuitBreaker(name = "phone-codes-service", fallbackMethod = "getPhoneCodeInfoFallback")
-    @Retry(name = "phone-codes-service")
+    //@CircuitBreaker(name = "phone-codes-service", fallbackMethod = "getPhoneCodeInfoFallback")
+    //@Retry(name = "phone-codes-service")
     @GetMapping("/api/v1/phone-codes/{phoneCodeId}")
     PhoneCodeResponseDto getPhoneCodeInfo(@PathVariable String phoneCodeId);
 

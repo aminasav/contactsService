@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 
 @Slf4j
 @Service
@@ -37,7 +36,7 @@ public class OutboxServiceImpl implements OutboxService {
 
             OutboxEventDTO eventDTO = outboxEventMapper.toDto(event);
 
-            ProducerRecord<String,OutboxEventDTO> record = new ProducerRecord<>(
+            ProducerRecord<String, OutboxEventDTO> record = new ProducerRecord<>(
                     topicName,
                     event.getId().toString(),
                     eventDTO
@@ -47,10 +46,9 @@ public class OutboxServiceImpl implements OutboxService {
             SendResult<String, OutboxEventDTO> result = null;
 
             try {
-                result = kafkaTemplate
-                        .send(record).get();
+                result = kafkaTemplate.send(record).get();
 
-                log.info("Processed outbox event: {}", eventDTO);
+                log.info("Processed outbox event: {}", eventDTO.toString());
                 log.info("Topic: {}", result.getRecordMetadata().topic());
                 log.info("Partition: {}", result.getRecordMetadata().partition());
                 log.info("Offset: {}", result.getRecordMetadata().offset());
@@ -58,9 +56,8 @@ public class OutboxServiceImpl implements OutboxService {
                 outboxEventRepository.delete(event);
                 log.info("Deleted outbox event: {}", eventDTO);
 
-            } catch (ExecutionException | InterruptedException e) {
+            } catch (Exception e) {
                 log.error(e.getMessage(), e);
-
             }
         }
     }

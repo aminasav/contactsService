@@ -55,7 +55,8 @@ public class ContactServiceImpl implements ContactService {
     @Override
     @Transactional
     public ContactResponseDto createContact(ContactRequestDto contactRequestDto) {
-        if (contactRepository.findByPhoneCodeIdAndPhoneNumber(contactRequestDto.phoneCodeId(), contactRequestDto.phoneNumber()).isPresent()) {
+        if (contactRepository.findByPhoneCodeIdAndPhoneNumber(contactRequestDto.phoneCodeId(),
+                contactRequestDto.phoneNumber()).isPresent()) {
             log.error("Contact with phone code ID {} and phone number {} already exists", contactRequestDto.phoneCodeId(), contactRequestDto.phoneNumber());
             throw new ContactAlreadyExistsException("Contact with the given phone code ID " + contactRequestDto.phoneCodeId() + " and phone number " + contactRequestDto.phoneNumber() + " already exists");
         }
